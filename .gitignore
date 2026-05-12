@@ -1,0 +1,4 @@
+caught.txt
+venv/
+__pycache__/
+*.pyc

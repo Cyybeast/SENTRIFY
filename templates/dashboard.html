@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>PhishSim - Dashboard</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: Arial, sans-serif; }
+
+        body { background: #f0f2f5; }
+
+        .navbar {
+            background: #1a0050;
+            padding: 18px 30px;
+            color: white;
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .navbar span { color: #3dd6b5; }
+
+        .container { padding: 30px; }
+
+        .stat-box {
+            background: white;
+            border-radius: 10px;
+            padding: 25px 30px;
+            display: inline-block;
+            margin-bottom: 30px;
+            border-left: 6px solid #e74c3c;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+
+        .stat-box h2 { font-size: 42px; color: #e74c3c; }
+        .stat-box p { color: #666; font-size: 14px; margin-top: 5px; }
+
+        table {
+            width: 100%;
+            background: white;
+            border-radius: 10px;
+            border-collapse: collapse;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            overflow: hidden;
+        }
+
+        th {
+            background: #1a0050;
+            color: white;
+            padding: 15px 20px;
+            text-align: left;
+            font-size: 14px;
+        }
+
+        td {
+            padding: 14px 20px;
+            border-bottom: 1px solid #f0f0f0;
+            font-size: 14px;
+            color: #333;
+        }
+
+        tr:last-child td { border-bottom: none; }
+
+        tr:hover td { background: #fafafa; }
+
+        .badge {
+            background: #ffe0e0;
+            color: #e74c3c;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .empty {
+            text-align: center;
+            padding: 40px;
+            color: #999;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="navbar"><span>Phish</span>Sim — Admin Dashboard</div>
+
+    <div class="container">
+
+        <div class="stat-box">
+            <h2>{{ total }}</h2>
+            <p>Employees caught so far</p>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Email Address</th>
+                    <th>Password Entered</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% if results %}
+                    {% for i, r in enumerate(results) %}
+                    <tr>
+                        <td>{{ i + 1 }}</td>
+                        <td>{{ r.email }}</td>
+                        <td>{{ r.password }}</td>
+                        <td><span class="badge">Clicked</span></td>
+                    </tr>
+                    {% endfor %}
+                {% else %}
+                    <tr>
+                        <td colspan="4" class="empty">No one has been caught yet.</td>
+                    </tr>
+                {% endif %}
+            </tbody>
+        </table>
+
+    </div>
+
+</body>
+</html>
