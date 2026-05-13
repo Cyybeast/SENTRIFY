@@ -1,9 +1,28 @@
 from flask import Flask, render_template, request, session, redirect, url_for
+import sqlite3
+from database import init_db
 
 app = Flask(__name__)
 app.secret_key = 'sentrify-secret-2024'
 
 ADMIN_PASSWORD = 'admin123'
+
+init_db()
+
+def log_result(email):
+    conn = sqlite3.connect('sentrify.db')
+    c = conn.cursor()
+    c.execute('INSERT INTO results (campaign_id, email) VALUES (?, ?)', (1, email))
+    conn.commit()
+    conn.close()
+
+def get_results():
+    conn = sqlite3.connect('sentrify.db')
+    c = conn.cursor()
+    c.execute('SELECT email, clicked_at FROM results ORDER BY clicked_at DESC')
+    rows = c.fetchall()
+    conn.close()
+    return rows
 
 @app.route('/')
 def home():
@@ -12,11 +31,7 @@ def home():
 @app.route('/capture', methods=['POST'])
 def capture():
     email = request.form.get('email')
-    password = request.form.get('password')
-
-    with open('caught.txt', 'a') as f:
-        f.write(f"{email},{password}\n")
-
+    log_result(email)
     return render_template('busted.html')
 
 @app.route('/admin', methods=['GET', 'POST'])
@@ -34,21 +49,9 @@ def dashboard():
     if not session.get('logged_in'):
         return redirect(url_for('admin_login'))
 
-    results = []
-    try:
-        with open('caught.txt', 'r') as f:
-            for line in f:
-                parts = line.strip().split(',')
-                if len(parts) == 2:
-                    results.append({
-                        'email': parts[0],
-                        'password': parts[1]
-                    })
-    except FileNotFoundError:
-        pass
-
-    total_caught = len(results)
-    return render_template('dashboard.html', results=results, total=total_caught)
+    results = get_results()
+    total = len(results)
+    return render_template('dashboard.html', results=results, total=total)
 
 app.jinja_env.globals['enumerate'] = enumerate
 app.run(debug=True)
