@@ -8,6 +8,8 @@ def init_db():
         CREATE TABLE IF NOT EXISTS campaigns (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             company_name TEXT NOT NULL,
+            campaign_name TEXT NOT NULL,
+            unique_code TEXT NOT NULL,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
     ''')
@@ -24,7 +26,7 @@ def init_db():
 
     conn.commit()
     conn.close()
-    print("Database ready.")
 
 if __name__ == '__main__':
     init_db()
+    print("Database ready.")

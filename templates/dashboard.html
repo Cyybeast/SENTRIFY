@@ -11,87 +11,65 @@
             color: white;
             font-size: 20px;
             font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            white-space: nowrap;
         }
-        .navbar span { color: #3dd6b5; }
+        .navbar .brand { color: white; }
+        .navbar .brand span { color: #3dd6b5; }
+        .btn-new {
+            background: #3dd6b5;
+            color: #1a0050;
+            padding: 8px 18px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: bold;
+            white-space: nowrap;
+            margin-left: 20px;
+        }
         .container { padding: 30px; }
-        .stat-box {
-            background: white;
-            border-radius: 10px;
-            padding: 25px 30px;
-            display: inline-block;
-            margin-bottom: 30px;
-            border-left: 6px solid #e74c3c;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-        }
-        .stat-box h2 { font-size: 42px; color: #e74c3c; }
-        .stat-box p { color: #666; font-size: 14px; margin-top: 5px; }
-        table {
-            width: 100%;
-            background: white;
-            border-radius: 10px;
-            border-collapse: collapse;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-            overflow: hidden;
-        }
-        th {
-            background: #1a0050;
-            color: white;
-            padding: 15px 20px;
-            text-align: left;
-            font-size: 14px;
-        }
-        td {
-            padding: 14px 20px;
-            border-bottom: 1px solid #f0f0f0;
-            font-size: 14px;
-            color: #333;
-        }
+        table { width: 100%; background: white; border-radius: 10px; border-collapse: collapse; box-shadow: 0 2px 8px rgba(0,0,0,0.08); overflow: hidden; }
+        th { background: #1a0050; color: white; padding: 15px 20px; text-align: left; font-size: 14px; }
+        td { padding: 14px 20px; border-bottom: 1px solid #f0f0f0; font-size: 14px; color: #333; }
         tr:last-child td { border-bottom: none; }
         tr:hover td { background: #fafafa; }
-        .badge {
-            background: #ffe0e0;
-            color: #e74c3c;
-            padding: 4px 10px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: bold;
-        }
-        .empty {
-            text-align: center;
-            padding: 40px;
-            color: #999;
-        }
+        .badge { background: #ffe0e0; color: #e74c3c; padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: bold; }
+        .view { color: #3dd6b5; text-decoration: none; font-size: 13px; }
+        .empty { text-align: center; padding: 40px; color: #999; }
     </style>
 </head>
 <body>
-    <div class="navbar"><span>Sentri</span>fy — Admin Dashboard</div>
+    <div class="navbar">
+        <div class="brand"><span>Sentri</span>fy — Dashboard</div>
+        <a class="btn-new" href="/dashboard/create">+ New Campaign</a>
+    </div>
     <div class="container">
-        <div class="stat-box">
-            <h2>{{ total }}</h2>
-            <p>Employees caught so far</p>
-        </div>
         <table>
             <thead>
                 <tr>
                     <th>#</th>
-                    <th>Email Address</th>
-                    <th>Time Caught</th>
-                    <th>Status</th>
+                    <th>Company</th>
+                    <th>Campaign</th>
+                    <th>Clicks</th>
+                    <th>Action</th>
                 </tr>
             </thead>
             <tbody>
-                {% if results %}
-                    {% for i, r in enumerate(results) %}
+                {% if campaigns %}
+                    {% for i, c in enumerate(campaigns) %}
                     <tr>
                         <td>{{ i + 1 }}</td>
-                        <td>{{ r[0] }}</td>
-                        <td>{{ r[1] }}</td>
-                        <td><span class="badge">Clicked</span></td>
+                        <td>{{ c[1] }}</td>
+                        <td>{{ c[2] }}</td>
+                        <td><span class="badge">{{ c[4] }} clicked</span></td>
+                        <td><a class="view" href="/dashboard/campaign/{{ c[0] }}">View Results →</a></td>
                     </tr>
                     {% endfor %}
                 {% else %}
                     <tr>
-                        <td colspan="4" class="empty">No one has been caught yet.</td>
+                        <td colspan="5" class="empty">No campaigns yet. Create your first one.</td>
                     </tr>
                 {% endif %}
             </tbody>
