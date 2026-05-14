@@ -1,10 +1,23 @@
 from flask import Flask, render_template, request, session, redirect, url_for
+from flask_mail import Mail, Message
 import sqlite3
 import uuid
+import csv
+import io
 from database import init_db
 
 app = Flask(__name__)
 app.secret_key = 'sentrify-secret-2024'
+
+# Email configuration
+app.config['MAIL_SERVER'] = 'smtp.gmail.com'
+app.config['MAIL_PORT'] = 587
+app.config['MAIL_USE_TLS'] = True
+app.config['MAIL_USERNAME'] = 'sentrify.test@gmail.com'
+app.config['MAIL_PASSWORD'] = 'uion ncth wfkt eukn'
+app.config['MAIL_DEFAULT_SENDER'] = 'sentrify.test@gmail.com'
+
+mail = Mail(app)
 
 ADMIN_PASSWORD = 'admin123'
 
@@ -58,6 +71,33 @@ def get_results_by_campaign(campaign_id):
     conn.close()
     return rows
 
+def send_phishing_email(recipient_email, campaign_code, company_name):
+    link = f"http://127.0.0.1:5000/sim/{campaign_code}"
+    msg = Message(
+        subject="Action Required: Your OPay Account Has Been Restricted",
+        recipients=[recipient_email]
+    )
+    msg.html = f"""
+    <div style="font-family: Arial, sans-serif; max-width: 520px; margin: 0 auto;">
+        <div style="background: linear-gradient(135deg, #0a1628, #2d6b6b); padding: 30px; text-align: center;">
+            <h1 style="color: white; font-size: 28px;">OPay</h1>
+        </div>
+        <div style="background: white; padding: 30px;">
+            <p style="color: #333;">Dear Customer,</p>
+            <p style="color: #333;">We detected <strong>3 failed login attempts</strong> on your OPay account. Your account has been temporarily restricted for your security.</p>
+            <p style="color: #333;">To restore access, please verify your identity immediately:</p>
+            <div style="text-align: center; margin: 30px 0;">
+                <a href="{link}" style="background: #3dd6b5; color: white; padding: 14px 32px; text-decoration: none; border-radius: 6px; font-weight: bold;">Verify My Account</a>
+            </div>
+            <p style="color: #999; font-size: 12px;">If you did not request this, please ignore this email.</p>
+        </div>
+        <div style="background: #f5f5f5; padding: 15px; text-align: center;">
+            <p style="color: #999; font-size: 11px;">OPay Financial Services | customerservice@opay-ng.com | 08136690274</p>
+        </div>
+    </div>
+    """
+    mail.send(msg)
+
 @app.route('/sim/<code>')
 def simulation(code):
     campaign = get_campaign_by_code(code)
@@ -107,9 +147,25 @@ def create():
         company = request.form.get('company_name')
         campaign = request.form.get('campaign_name')
         code = create_campaign(company, campaign)
+
+        # Send emails if CSV uploaded
+        emails_sent = 0
+        if 'staff_csv' in request.files:
+            file = request.files['staff_csv']
+            if file.filename != '':
+                stream = io.StringIO(file.stream.read().decode('UTF-8'))
+                reader = csv.reader(stream)
+                for row in reader:
+                    if row and '@' in row[0]:
+                        try:
+                            send_phishing_email(row[0].strip(), code, company)
+                            emails_sent += 1
+                        except Exception as e:
+                            print(f"Failed to send to {row[0]}: {e}")
+
         link = f"http://127.0.0.1:5000/sim/{code}"
-        return render_template('create.html', link=link, success=True)
-    return render_template('create.html', success=False)
+        return render_template('create.html', link=link, success=True, emails_sent=emails_sent)
+    return render_template('create.html', success=False, emails_sent=0)
 
 app.jinja_env.globals['enumerate'] = enumerate
 app.run(debug=True)
