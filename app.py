@@ -9,7 +9,6 @@ from database import init_db
 app = Flask(__name__)
 app.secret_key = 'sentrify-secret-2024'
 
-# Email configuration
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
 app.config['MAIL_PORT'] = 587
 app.config['MAIL_USE_TLS'] = True
@@ -21,14 +20,35 @@ mail = Mail(app)
 
 ADMIN_PASSWORD = 'admin123'
 
+TEMPLATES = {
+    'opay': {
+        'name': 'OPay',
+        'subject': 'Action Required: Your OPay Account Has Been Restricted',
+        'color': '#3dd6b5',
+        'template_file': 'simulations/opay.html'
+    },
+    'gtbank': {
+        'name': 'GTBank',
+        'subject': 'Urgent: Verify Your GTBank Internet Banking Account',
+        'color': '#e00000',
+        'template_file': 'simulations/gtbank.html'
+    },
+    'mtn': {
+        'name': 'MTN Nigeria',
+        'subject': 'Important: Your MTN Account Requires Verification',
+        'color': '#ffcc00',
+        'template_file': 'simulations/mtn.html'
+    },
+}
+
 init_db()
 
-def create_campaign(company_name, campaign_name):
+def create_campaign(company_name, campaign_name, template):
     code = str(uuid.uuid4())[:8]
     conn = sqlite3.connect('sentrify.db')
     c = conn.cursor()
-    c.execute('INSERT INTO campaigns (company_name, campaign_name, unique_code) VALUES (?, ?, ?)',
-              (company_name, campaign_name, code))
+    c.execute('INSERT INTO campaigns (company_name, campaign_name, unique_code, template) VALUES (?, ?, ?, ?)',
+              (company_name, campaign_name, code, template))
     conn.commit()
     conn.close()
     return code
@@ -43,7 +63,7 @@ def log_result(campaign_id, email):
 def get_campaign_by_code(code):
     conn = sqlite3.connect('sentrify.db')
     c = conn.cursor()
-    c.execute('SELECT id, company_name, campaign_name FROM campaigns WHERE unique_code = ?', (code,))
+    c.execute('SELECT id, company_name, campaign_name, template FROM campaigns WHERE unique_code = ?', (code,))
     row = c.fetchone()
     conn.close()
     return row
@@ -53,7 +73,7 @@ def get_all_campaigns():
     c = conn.cursor()
     c.execute('''
         SELECT campaigns.id, campaigns.company_name, campaigns.campaign_name,
-               campaigns.unique_code, COUNT(results.id) as clicks
+               campaigns.unique_code, COUNT(results.id) as clicks, campaigns.template
         FROM campaigns
         LEFT JOIN results ON campaigns.id = results.campaign_id
         GROUP BY campaigns.id
@@ -71,28 +91,26 @@ def get_results_by_campaign(campaign_id):
     conn.close()
     return rows
 
-def send_phishing_email(recipient_email, campaign_code, company_name):
+def send_phishing_email(recipient_email, campaign_code, template_key):
+    t = TEMPLATES.get(template_key, TEMPLATES['opay'])
     link = f"http://127.0.0.1:5000/sim/{campaign_code}"
-    msg = Message(
-        subject="Action Required: Your OPay Account Has Been Restricted",
-        recipients=[recipient_email]
-    )
+    msg = Message(subject=t['subject'], recipients=[recipient_email])
     msg.html = f"""
     <div style="font-family: Arial, sans-serif; max-width: 520px; margin: 0 auto;">
-        <div style="background: linear-gradient(135deg, #0a1628, #2d6b6b); padding: 30px; text-align: center;">
-            <h1 style="color: white; font-size: 28px;">OPay</h1>
+        <div style="background: {t['color']}; padding: 30px; text-align: center;">
+            <h1 style="color: white; font-size: 28px;">{t['name']}</h1>
         </div>
         <div style="background: white; padding: 30px;">
             <p style="color: #333;">Dear Customer,</p>
-            <p style="color: #333;">We detected <strong>3 failed login attempts</strong> on your OPay account. Your account has been temporarily restricted for your security.</p>
+            <p style="color: #333;">We detected <strong>3 failed login attempts</strong> on your {t['name']} account. Your account has been temporarily restricted.</p>
             <p style="color: #333;">To restore access, please verify your identity immediately:</p>
             <div style="text-align: center; margin: 30px 0;">
-                <a href="{link}" style="background: #3dd6b5; color: white; padding: 14px 32px; text-decoration: none; border-radius: 6px; font-weight: bold;">Verify My Account</a>
+                <a href="{link}" style="background: {t['color']}; color: white; padding: 14px 32px; text-decoration: none; border-radius: 6px; font-weight: bold;">Verify My Account</a>
             </div>
             <p style="color: #999; font-size: 12px;">If you did not request this, please ignore this email.</p>
         </div>
         <div style="background: #f5f5f5; padding: 15px; text-align: center;">
-            <p style="color: #999; font-size: 11px;">OPay Financial Services | customerservice@opay-ng.com | 08136690274</p>
+            <p style="color: #999; font-size: 11px;">{t['name']} Customer Support</p>
         </div>
     </div>
     """
@@ -103,7 +121,9 @@ def simulation(code):
     campaign = get_campaign_by_code(code)
     if not campaign:
         return 'Invalid link.', 404
-    return render_template('index.html', code=code)
+    template_key = campaign[3]
+    template_info = TEMPLATES.get(template_key, TEMPLATES['opay'])
+    return render_template(template_info['template_file'], code=code)
 
 @app.route('/capture/<code>', methods=['POST'])
 def capture(code):
@@ -146,9 +166,9 @@ def create():
     if request.method == 'POST':
         company = request.form.get('company_name')
         campaign = request.form.get('campaign_name')
-        code = create_campaign(company, campaign)
+        template = request.form.get('template', 'opay')
+        code = create_campaign(company, campaign, template)
 
-        # Send emails if CSV uploaded
         emails_sent = 0
         if 'staff_csv' in request.files:
             file = request.files['staff_csv']
@@ -158,14 +178,15 @@ def create():
                 for row in reader:
                     if row and '@' in row[0]:
                         try:
-                            send_phishing_email(row[0].strip(), code, company)
+                            send_phishing_email(row[0].strip(), code, template)
                             emails_sent += 1
                         except Exception as e:
                             print(f"Failed to send to {row[0]}: {e}")
 
         link = f"http://127.0.0.1:5000/sim/{code}"
-        return render_template('create.html', link=link, success=True, emails_sent=emails_sent)
-    return render_template('create.html', success=False, emails_sent=0)
+        return render_template('create.html', link=link, success=True,
+                               emails_sent=emails_sent, templates=TEMPLATES)
+    return render_template('create.html', success=False, emails_sent=0, templates=TEMPLATES)
 
 app.jinja_env.globals['enumerate'] = enumerate
 app.run(debug=True)

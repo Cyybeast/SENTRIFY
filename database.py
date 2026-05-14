@@ -10,6 +10,7 @@ def init_db():
             company_name TEXT NOT NULL,
             campaign_name TEXT NOT NULL,
             unique_code TEXT NOT NULL,
+            template TEXT DEFAULT 'opay',
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
     ''')
