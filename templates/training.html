@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Security Awareness Training</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: Arial, sans-serif; }
+        body { background: #f0f2f5; }
+        .navbar {
+            background: #1a0050;
+            padding: 15px 30px;
+            color: white;
+            font-size: 18px;
+            font-weight: bold;
+        }
+        .navbar span { color: #3dd6b5; }
+        .container {
+            max-width: 680px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+        .progress-bar {
+            background: #ddd;
+            border-radius: 10px;
+            height: 8px;
+            margin-bottom: 25px;
+        }
+        .progress-fill {
+            background: #3dd6b5;
+            height: 8px;
+            border-radius: 10px;
+            width: 50%;
+        }
+        .card {
+            background: white;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            margin-bottom: 20px;
+        }
+        .card h2 {
+            color: #1a0050;
+            font-size: 18px;
+            margin-bottom: 15px;
+        }
+        .card p {
+            color: #444;
+            font-size: 14px;
+            line-height: 1.7;
+            margin-bottom: 12px;
+        }
+        .warning-box {
+            background: #fff8e1;
+            border-left: 4px solid #f39c12;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 15px 0;
+            font-size: 13px;
+            color: #555;
+        }
+        .red-flag {
+            background: #fff0f0;
+            border-left: 4px solid #e74c3c;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 15px 0;
+            font-size: 13px;
+            color: #555;
+        }
+        .red-flag h4 { color: #e74c3c; margin-bottom: 8px; font-size: 14px; }
+        .tip-list { list-style: none; padding: 0; }
+        .tip-list li {
+            padding: 10px 0 10px 30px;
+            border-bottom: 1px solid #f0f0f0;
+            font-size: 14px;
+            color: #333;
+            position: relative;
+        }
+        .tip-list li:before {
+            content: "✅";
+            position: absolute;
+            left: 0;
+        }
+        .tip-list li:last-child { border-bottom: none; }
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 14px;
+            background: #1a0050;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 15px;
+            font-weight: bold;
+            cursor: pointer;
+            text-align: center;
+            text-decoration: none;
+            margin-top: 10px;
+        }
+        .section-label {
+            font-size: 12px;
+            color: #999;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="navbar"><span>Sentri</span>fy — Security Awareness Training</div>
+    <div class="container">
+
+        <div class="progress-bar">
+            <div class="progress-fill"></div>
+        </div>
+
+        <div class="card">
+            <div class="section-label">Lesson 1 of 1</div>
+            <h2>How Phishing Attacks Work</h2>
+            <p>Phishing is one of the most common ways cybercriminals steal information. An attacker sends you an email that looks like it comes from a trusted source — your bank, your payment app, your employer — and tricks you into clicking a link and entering your credentials.</p>
+            <p>The email you just clicked was a simulated phishing attack designed to look like a real message from a trusted Nigerian brand. You entered your credentials on a fake page — in a real attack, those credentials would now belong to a criminal.</p>
+
+            <div class="red-flag">
+                <h4>🚩 Red Flags In That Email</h4>
+                The sender domain was not the official company domain — real companies always send from their official domain.<br><br>
+                The email created urgency — "your account has been restricted" — to make you act without thinking.<br><br>
+                The link did not go to the real website — always check the URL before entering any information.
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>How To Protect Yourself</h2>
+            <ul class="tip-list">
+                <li>Always check the sender's email address carefully — fake domains often look similar to real ones</li>
+                <li>Hover over links before clicking to see the real destination URL</li>
+                <li>When in doubt, go directly to the website by typing it in your browser — never click links in emails</li>
+                <li>Legitimate companies will never ask for your password via email</li>
+                <li>If you receive a suspicious email at work, report it to your IT team immediately</li>
+                <li>Enable two-factor authentication on all important accounts</li>
+            </ul>
+        </div>
+
+        <div class="card">
+            <div class="warning-box">
+                You've read the training material. Now take a short quiz to complete your training. You must pass to receive your certificate.
+            </div>
+            <a href="/quiz/{{ code }}" class="btn">Take The Quiz →</a>
+        </div>
+
+    </div>
+</body>
+</html>

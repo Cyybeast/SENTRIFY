@@ -41,6 +41,9 @@ TEMPLATES = {
     },
 }
 
+# Correct quiz answers
+ANSWERS = {'q1': 'b', 'q2': 'b', 'q3': 'b', 'q4': 'c'}
+
 init_db()
 
 def create_campaign(company_name, campaign_name, template):
@@ -57,6 +60,14 @@ def log_result(campaign_id, email):
     conn = sqlite3.connect('sentrify.db')
     c = conn.cursor()
     c.execute('INSERT INTO results (campaign_id, email) VALUES (?, ?)', (campaign_id, email))
+    conn.commit()
+    conn.close()
+
+def mark_training_complete(campaign_id, email):
+    conn = sqlite3.connect('sentrify.db')
+    c = conn.cursor()
+    c.execute('UPDATE results SET training_completed = 1 WHERE campaign_id = ? AND email = ?',
+              (campaign_id, email))
     conn.commit()
     conn.close()
 
@@ -86,7 +97,9 @@ def get_all_campaigns():
 def get_results_by_campaign(campaign_id):
     conn = sqlite3.connect('sentrify.db')
     c = conn.cursor()
-    c.execute('SELECT email, clicked_at FROM results WHERE campaign_id = ? ORDER BY clicked_at DESC', (campaign_id,))
+    c.execute('''SELECT email, clicked_at, training_completed
+                 FROM results WHERE campaign_id = ?
+                 ORDER BY clicked_at DESC''', (campaign_id,))
     rows = c.fetchall()
     conn.close()
     return rows
@@ -132,7 +145,37 @@ def capture(code):
         return 'Invalid link.', 404
     email = request.form.get('email')
     log_result(campaign[0], email)
-    return render_template('busted.html')
+    session['caught_email'] = email
+    session['caught_campaign_id'] = campaign[0]
+    return render_template('busted.html', code=code)
+
+@app.route('/training/<code>')
+def training(code):
+    campaign = get_campaign_by_code(code)
+    if not campaign:
+        return 'Invalid link.', 404
+    return render_template('training.html', code=code)
+
+@app.route('/quiz/<code>', methods=['GET', 'POST'])
+def quiz(code):
+    campaign = get_campaign_by_code(code)
+    if not campaign:
+        return 'Invalid link.', 404
+
+    if request.method == 'POST':
+        score = 0
+        for q, correct in ANSWERS.items():
+            if request.form.get(q) == correct:
+                score += 1
+        passed = score >= 3
+        if passed:
+            email = session.get('caught_email')
+            campaign_id = session.get('caught_campaign_id')
+            if email and campaign_id:
+                mark_training_complete(campaign_id, email)
+        return render_template('complete.html', passed=passed, score=score, code=code)
+
+    return render_template('quiz.html', code=code)
 
 @app.route('/admin', methods=['GET', 'POST'])
 def admin_login():
@@ -157,7 +200,9 @@ def campaign_detail(campaign_id):
         return redirect(url_for('admin_login'))
     results = get_results_by_campaign(campaign_id)
     total = len(results)
-    return render_template('campaign_detail.html', results=results, total=total, campaign_id=campaign_id)
+    trained = sum(1 for r in results if r[2] == 1)
+    return render_template('campaign_detail.html', results=results,
+                           total=total, trained=trained, campaign_id=campaign_id)
 
 @app.route('/dashboard/create', methods=['GET', 'POST'])
 def create():

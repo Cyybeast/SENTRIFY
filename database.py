@@ -20,6 +20,7 @@ def init_db():
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             campaign_id INTEGER,
             email TEXT,
+            training_completed INTEGER DEFAULT 0,
             clicked_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             FOREIGN KEY (campaign_id) REFERENCES campaigns (id)
         )

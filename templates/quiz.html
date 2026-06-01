@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Security Training Quiz</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: Arial, sans-serif; }
+        body { background: #f0f2f5; }
+        .navbar {
+            background: #1a0050;
+            padding: 15px 30px;
+            color: white;
+            font-size: 18px;
+            font-weight: bold;
+        }
+        .navbar span { color: #3dd6b5; }
+        .container {
+            max-width: 680px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+        .progress-bar {
+            background: #ddd;
+            border-radius: 10px;
+            height: 8px;
+            margin-bottom: 25px;
+        }
+        .progress-fill {
+            background: #3dd6b5;
+            height: 8px;
+            border-radius: 10px;
+            width: 100%;
+        }
+        .card {
+            background: white;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            margin-bottom: 20px;
+        }
+        .card h2 { color: #1a0050; font-size: 18px; margin-bottom: 20px; }
+        .question {
+            font-size: 15px;
+            color: #333;
+            font-weight: bold;
+            margin-bottom: 15px;
+            line-height: 1.5;
+        }
+        .options { list-style: none; }
+        .options li {
+            margin-bottom: 10px;
+        }
+        .options label {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 15px;
+            border: 2px solid #eee;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            color: #333;
+            transition: border-color 0.2s;
+        }
+        .options label:hover { border-color: #1a0050; }
+        .options input[type="radio"] { accent-color: #1a0050; }
+        .question-block { margin-bottom: 25px; }
+        .btn {
+            width: 100%;
+            padding: 14px;
+            background: #1a0050;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 15px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .section-label {
+            font-size: 12px;
+            color: #999;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="navbar"><span>Sentri</span>fy — Security Awareness Training</div>
+    <div class="container">
+
+        <div class="progress-bar">
+            <div class="progress-fill"></div>
+        </div>
+
+        <div class="card">
+            <div class="section-label">Quiz — Answer all questions</div>
+            <h2>Test Your Knowledge</h2>
+
+            <form action="/quiz/{{ code }}" method="POST">
+
+                <div class="question-block">
+                    <div class="question">1. You receive an urgent email saying your OPay account has been restricted. What should you do?</div>
+                    <ul class="options">
+                        <li><label><input type="radio" name="q1" value="a"> Click the link in the email to verify your account immediately</label></li>
+                        <li><label><input type="radio" name="q1" value="b"> Open your browser and go directly to opay.com by typing it yourself</label></li>
+                        <li><label><input type="radio" name="q1" value="c"> Reply to the email asking for more information</label></li>
+                    </ul>
+                </div>
+
+                <div class="question-block">
+                    <div class="question">2. How can you tell if an email link is safe before clicking it?</div>
+                    <ul class="options">
+                        <li><label><input type="radio" name="q2" value="a"> Check if the email looks professional and well designed</label></li>
+                        <li><label><input type="radio" name="q2" value="b"> Hover over the link to see the real destination URL before clicking</label></li>
+                        <li><label><input type="radio" name="q2" value="c"> Check if the email came from someone you know</label></li>
+                    </ul>
+                </div>
+
+                <div class="question-block">
+                    <div class="question">3. A legitimate company will never do which of the following?</div>
+                    <ul class="options">
+                        <li><label><input type="radio" name="q3" value="a"> Send you a monthly account statement</label></li>
+                        <li><label><input type="radio" name="q3" value="b"> Ask for your password via email</label></li>
+                        <li><label><input type="radio" name="q3" value="c"> Send you a promotional offer</label></li>
+                    </ul>
+                </div>
+
+                <div class="question-block">
+                    <div class="question">4. What should you do if you receive a suspicious email at work?</div>
+                    <ul class="options">
+                        <li><label><input type="radio" name="q4" value="a"> Delete it and say nothing</label></li>
+                        <li><label><input type="radio" name="q4" value="b"> Forward it to your colleagues to warn them</label></li>
+                        <li><label><input type="radio" name="q4" value="c"> Report it to your IT team immediately without clicking anything</label></li>
+                    </ul>
+                </div>
+
+                <button type="submit" class="btn">Submit Answers</button>
+            </form>
+        </div>
+    </div>
+</body>
+</html>
