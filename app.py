@@ -5,6 +5,9 @@ import uuid
 import csv
 import io
 from database import init_db
+from report import generate_report
+import os
+from flask import send_file
 
 app = Flask(__name__)
 app.secret_key = 'sentrify-secret-2024'
@@ -232,6 +235,15 @@ def create():
         return render_template('create.html', link=link, success=True,
                                emails_sent=emails_sent, templates=TEMPLATES)
     return render_template('create.html', success=False, emails_sent=0, templates=TEMPLATES)
+@app.route('/dashboard/campaign/<int:campaign_id>/report')
+def download_report(campaign_id):
+    if not session.get('logged_in'):
+        return redirect(url_for('admin_login'))
+    output_path = f'report_{campaign_id}.pdf'
+    success = generate_report(campaign_id, output_path)
+    if not success:
+        return 'Campaign not found.', 404
+    return send_file(output_path, as_attachment=True, download_name=f'Sentrify_Report_{campaign_id}.pdf')
 
 app.jinja_env.globals['enumerate'] = enumerate
 app.run(debug=True)
