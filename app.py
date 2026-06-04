@@ -250,4 +250,5 @@ def download_report(campaign_id):
     return send_file(output_path, as_attachment=True, download_name=f'Sentrify_Report_{campaign_id}.pdf')
 
 app.jinja_env.globals['enumerate'] = enumerate
-app.run(debug=True)
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=5000, debug=False)
