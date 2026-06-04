@@ -4,24 +4,28 @@ import sqlite3
 import uuid
 import csv
 import io
+import os
 from database import init_db
+from dotenv import load_dotenv
+
+load_dotenv()
 from report import generate_report
 import os
 from flask import send_file
 
 app = Flask(__name__)
-app.secret_key = 'sentrify-secret-2024'
+app.secret_key = os.getenv('SECRET_KEY', 'sentrify-secret-2024')
 
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
 app.config['MAIL_PORT'] = 587
 app.config['MAIL_USE_TLS'] = True
-app.config['MAIL_USERNAME'] = 'sentrify.test@gmail.com'
-app.config['MAIL_PASSWORD'] = 'uion ncth wfkt eukn'
-app.config['MAIL_DEFAULT_SENDER'] = 'sentrify.test@gmail.com'
+app.config['MAIL_USERNAME'] = os.getenv('sentrify.test@gmail.com')
+app.config['MAIL_PASSWORD'] = os.getenv('uion ncth wfkt eukn')
+app.config['MAIL_DEFAULT_SENDER'] = os.getenv('sentrify.test@gmail.com')
 
 mail = Mail(app)
 
-ADMIN_PASSWORD = 'admin123'
+ADMIN_PASSWORD = os.getenv('ADMIN_PASSWORD', 'admin123')
 
 TEMPLATES = {
     'opay': {

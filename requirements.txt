@@ -1,1 +1,6 @@
 flask
+flask-mail
+reportlab
+anthropic
+gunicorn
+python-dotenv
